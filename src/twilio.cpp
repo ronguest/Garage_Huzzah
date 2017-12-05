@@ -55,7 +55,8 @@ bool Twilio::send_message(
                 response += ("Certificate fingerprints match.\r\n");
         } else {
                 response += ("Certificate fingerprints don't match.\r\n");
-                return false;
+                // ***** We are ignoring this error as it is too fragile to base it on fingerprints
+                //return false;
         }
 
         // Attempt to send an SMS or MMS, depending on picture URL

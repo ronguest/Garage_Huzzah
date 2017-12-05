@@ -135,8 +135,8 @@ void sendAlert(int alertType) {
   if (success) {
     Serial.println("Success sending SMS");
   } else {
-    Serial.println("POST to twilio failed: ");
     Serial.println(response);
+    Serial.println("POST to twilio failed: ");
   }
 }
 
