@@ -1,4 +1,4 @@
-# M0 Weather Display
+# Garage Huzzah
 Copyright (C) 2017 Ronald Guest <http://about.me/ronguest>
 
                 GNU GENERAL PUBLIC LICENSE
