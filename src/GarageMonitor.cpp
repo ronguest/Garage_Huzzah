@@ -72,7 +72,6 @@ void loop() {
 
   if ((minute() == 0) && (second() == 0)) {
     // Send a heartbeat message to AIO once an hour
-    // Note since this has no real clock, this check is not actually at 00:00 in real terms
     aio_Heartbeat();
   }
   delay(pollTime);    // Throttle loop speed, should be at least 1 second
