@@ -31,6 +31,9 @@ void setup() {
 
   twilio = new Twilio(account_sid, auth_token, fingerprint);
 
+  server.begin();   // For the health checks
+  Serial.printf("Web server started, open %s in a web browser\n", WiFi.localIP().toString().c_str());
+
   // pause for serial connection for debugging, don't block in case in production mode
   // On the Huzzah, when this was right after Serial.begin the Wifi connection never worked
   delay(5000);
@@ -44,6 +47,35 @@ void setup() {
 }
 
 void loop() {
+  // Allows a client connection and responds with either open or closed, used for a health check
+  WiFiClient client = server.available();
+  // wait for a client (web browser) to connect
+  if (client)
+  {
+    Serial.println("\n[Client connected]");
+    while (client.connected())
+    {
+      // read line by line what the client (web browser) is requesting
+      if (client.available())
+      {
+        String line = client.readStringUntil('\r');
+        Serial.print(line);
+        // wait for end of client's request, that is marked with an empty line
+        if (line.length() == 1 && line[0] == '\n')
+        {
+          client.println(prepareHtmlPage());
+          break;
+        }
+      }
+    }
+
+    delay(1); // give the web browser time to receive the data
+
+    // close the connection:
+    client.stop();
+    Serial.println("[Client disonnected]");
+  }
+
   currentState = doorState(inputPin);
   // If the state changed, & door had been opened > openMinutes send a SMS
   // Set the previousState and note when the time when the state changed
@@ -132,4 +164,21 @@ void sendAlert(int alertType) {
     Serial.println(response);
     Serial.println("POST to twilio failed: ");
   }
+}
+
+// prepare a web page to be send to a client (web browser)
+String prepareHtmlPage()
+{
+  String htmlPage =
+     String("HTTP/1.1 200 OK\r\n") +
+            "Content-Type: text/html\r\n" +
+            "Connection: close\r\n" +  // the connection will be closed after completion of the response
+//"Refresh: 5\r\n" +  // refresh the page automatically every 5 sec
+            "\r\n" +
+            "<!DOCTYPE HTML>" +
+            "<html>" +
+            (doorState(inputPin) ? garageOpen : garageClosed) +
+            "</html>" +
+            "\r\n";
+  return htmlPage;
 }

@@ -6,9 +6,11 @@
 
 boolean currentState, previousState;
 time_t stateChangeTime;
+String prepareHtmlPage();
+
+WiFiServer server(80);              // For health checks
 
 Twilio *twilio;
-
 // Optional - a url to an image.  See 'MediaUrl' here:
 // https://www.twilio.com/docs/api/rest/sending-messages
 String media_url = "";
