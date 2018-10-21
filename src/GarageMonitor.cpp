@@ -8,8 +8,6 @@
 #include "GarageMonitor.h"
 
 int doorState(int);
-void aio_Status(char*);
-void aio_Heartbeat();
 void sendAlert(int);
 
 void setup() {
@@ -42,7 +40,6 @@ void setup() {
   currentState = doorState(inputPin);
   previousState = currentState;
 
-  aio_Status("Guardian Started");
   sendAlert(READY);
 }
 
@@ -55,7 +52,6 @@ void loop() {
       // State went from Open to Closed
       alarmSent = false;
       sendAlert(G_CLOSED);
-      aio_Status("Garage closed");
     }
     previousState = currentState;
     stateChangeTime = now();
@@ -65,15 +61,14 @@ void loop() {
   if (currentState == doorOpen) {
     if ((now() - stateChangeTime) > (openMinutes * 60) && !alarmSent) {
       sendAlert(OPEN);
-      aio_Status("Garage is open!");
       alarmSent = true;
     }
   }
 
-  if ((minute() == 0) && (second() == 0)) {
+  /*if ((minute() == 0) && (second() == 0)) {
     // Send a heartbeat message to AIO once an hour
     aio_Heartbeat();
-  }
+  }*/
   delay(pollTime);    // Throttle loop speed, should be at least 1 second
 }
 
@@ -136,51 +131,5 @@ void sendAlert(int alertType) {
   } else {
     Serial.println(response);
     Serial.println("POST to twilio failed: ");
-  }
-}
-
-// Function to connect and reconnect as necessary to the MQTT server.
-// Should be called in the loop function and it will take care if connecting.
-void MQTT_connect() {
-  int8_t ret;
-
-  // Stop if already connected.
-  if (mqtt.connected()) {
-    return;
-  }
-
-  Serial.print("Connecting to MQTT... ");
-  uint8_t retries = 3;
-  while ((ret = mqtt.connect()) != 0) { // connect will return 0 for connected
-       Serial.println(mqtt.connectErrorString(ret));
-       Serial.println("Retrying MQTT connection in 5 seconds...");
-       mqtt.disconnect();
-       delay(5000);  // wait 5 seconds
-       retries--;
-       if (retries == 0) {
-         // basically die and wait for WDT to reset me
-         while (1);
-       }
-  }
-  Serial.println("MQTT Connected!");
-}
-
-void aio_Status(char *message) {
-  MQTT_connect();
-
-  if (! statusFeed.publish(message)) {
-    Serial.println(F("MQTT send Failed"));
-  } else {
-    Serial.println(F("MQTT send OK!"));
-  }
-}
-
-void aio_Heartbeat() {
-  MQTT_connect();
-
-  if (! heartBeatFeed.publish("I'm alive!")) {
-    Serial.println(F("MQTT send Failed"));
-  } else {
-    Serial.println(F("MQTT send OK!"));
   }
 }

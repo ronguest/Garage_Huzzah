@@ -1,8 +1,5 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
-#include <AdafruitIO.h>
-#include "Adafruit_MQTT.h"
-#include "Adafruit_MQTT_Client.h"
 #include "twilio.hpp"
 #include <TimeLib.h>
 #include "credentials.h"
@@ -12,19 +9,6 @@ time_t stateChangeTime;
 
 // Create an ESP8266 WiFiClient class to connect to the MQTT server.
 WiFiClient client;
-
-void MQTT_connect();
-
-// Setup the MQTT client class by passing in the WiFi client and MQTT server and login details.
-Adafruit_MQTT_Client mqtt(&client, AIO_SERVER, AIO_SERVERPORT, AIO_USERNAME, AIO_KEY);
-
-// Setup a feed called 'Guardian Status' for publishing.
-// Notice MQTT paths for AIO follow the form: <username>/feeds/<feedname>
-Adafruit_MQTT_Publish statusFeed = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/Guardian Status");
-Adafruit_MQTT_Publish heartBeatFeed = Adafruit_MQTT_Publish(&mqtt, AIO_USERNAME "/feeds/Guardian Heartbeat");
-
-// Setup a feed called 'onoff' for subscribing to changes.
-//Adafruit_MQTT_Subscribe onoffbutton = Adafruit_MQTT_Subscribe(&mqtt, AIO_USERNAME "/feeds/onoff");
 
 Twilio *twilio;
 
