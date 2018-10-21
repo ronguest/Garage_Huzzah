@@ -7,9 +7,6 @@
 boolean currentState, previousState;
 time_t stateChangeTime;
 
-// Create an ESP8266 WiFiClient class to connect to the MQTT server.
-WiFiClient client;
-
 Twilio *twilio;
 
 // Optional - a url to an image.  See 'MediaUrl' here:

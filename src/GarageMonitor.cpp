@@ -45,7 +45,7 @@ void setup() {
 
 void loop() {
   currentState = doorState(inputPin);
-  // If the state changed, & door had been opened > openMinutes send a SMS and update AIO
+  // If the state changed, & door had been opened > openMinutes send a SMS
   // Set the previousState and note when the time when the state changed
   if (currentState != previousState) {
     if ((previousState == doorOpen)  && ((now() - stateChangeTime) > (openMinutes * 60))) {
