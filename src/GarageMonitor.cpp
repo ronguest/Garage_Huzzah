@@ -12,6 +12,7 @@ void sendAlert(int);
 
 void setup() {
   Serial.begin(115200);
+  delay(3000);
 
   pinMode(inputPin, INPUT);
   pinMode(ledPin, OUTPUT);
