@@ -51,9 +51,14 @@ bool Twilio::send_message(
                 get the code working again. Having the fingerprint in the Twilio constructor call
                 in GarageMonitor.cpp wasn't doing any good. I don't understand why this change was
                 needed. I'm filing this in the "it works for now" category.
+
+                To get new fingerprint load api.twilio.com in Safari, click in the address bar's lock
+                icon, then view cert details and the fingerprints are at the very bottom
+
+                Fingerprint updated: Apr 29, 2020
                 */
-        Serial.printf("Using fingerprint '%s'\n", "06 86 86 C0 A0 ED 02 20 7A 55 CC F0 75 BB CF 24 B1 D9 C0 49");
-        client.setFingerprint("06 86 86 C0 A0 ED 02 20 7A 55 CC F0 75 BB CF 24 B1 D9 C0 49");
+        Serial.printf("Using fingerprint '%s'\n", "BC B0 1A 32 80 5D E6 E4 A2 29 66 2B 08 C8 E0 4C 45 29 3F D0");
+        client.setFingerprint("BC B0 1A 32 80 5D E6 E4 A2 29 66 2B 08 C8 E0 4C 45 29 3F D0");
 
         // Connect to Twilio's REST API
         response += ("Connecting to host ");
