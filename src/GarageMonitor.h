@@ -53,5 +53,8 @@ const int READY=1;
 const int OPEN=3;
 const int G_CLOSED=4;
 
+String fingerprint = "";
+
 void sendAlert();
 int doorState();
+boolean get_Fingerprint();

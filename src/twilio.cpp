@@ -18,7 +18,8 @@ bool Twilio::send_message(
         const String& from_number,
         const String& message_body,
         String& response,
-        const String& picture_url)
+        const String& picture_url,
+        String fp)
 {
         // Check the body is less than 1600 characters in length.  see:
         // https://support.twilio.com/hc/en-us/articles/223181508-Does-Twilio-support-concatenated-SMS-messages-or-messages-over-160-characters-
@@ -57,8 +58,8 @@ bool Twilio::send_message(
 
                 Fingerprint updated: Apr 29, 2020
                 */
-        Serial.printf("Using fingerprint '%s'\n", "BC B0 1A 32 80 5D E6 E4 A2 29 66 2B 08 C8 E0 4C 45 29 3F D0");
-        client.setFingerprint("BC B0 1A 32 80 5D E6 E4 A2 29 66 2B 08 C8 E0 4C 45 29 3F D0");
+        Serial.printf("Using fingerprint '%s'\n", fp.c_str());
+        client.setFingerprint(fp.c_str());
 
         // Connect to Twilio's REST API
         response += ("Connecting to host ");
@@ -96,9 +97,9 @@ bool Twilio::send_message(
         // Read the response into the 'response' string
         response += ("request sent");
         while (client.connected()) {
-        String line = client.readStringUntil('\n');
-        response += (line);
-        response += ("\r\n");
+                String line = client.readStringUntil('\n');
+                response += (line);
+                response += ("\r\n");
         }
         response += ("closing connection");
         return true;

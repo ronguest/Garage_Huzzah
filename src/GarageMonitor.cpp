@@ -30,7 +30,7 @@ void setup() {
   Serial.println();
   Serial.print("WiFi connected: "); Serial.println(WiFi.localIP());
 
-  twilio = new Twilio(account_sid, auth_token, fingerprint);
+  twilio = new Twilio(account_sid, auth_token, fingerprint.c_str());
 
   server.begin();   // For the health checks
   Serial.printf("Web server started, open %s in a web browser\n", WiFi.localIP().toString().c_str());
@@ -43,6 +43,8 @@ void setup() {
   stateChangeTime = now();
   currentState = doorState(inputPin);
   previousState = currentState;
+
+  get_Fingerprint();
 
   sendAlert(READY);
 }
@@ -98,10 +100,10 @@ void loop() {
     }
   }
 
-  /*if ((minute() == 0) && (second() == 0)) {
+  if ((minute() == 0) && (second() == 0)) {
     // Send a heartbeat message to AIO once an hour
-    aio_Heartbeat();
-  }*/
+    get_Fingerprint();
+  }
   delay(pollTime);    // Throttle loop speed, should be at least 1 second
 }
 
@@ -134,6 +136,8 @@ int doorState (int pin) {
 }
 
 void sendAlert(int alertType) {
+  Serial.print("sendAlert fingerprint is: ");
+  Serial.println(fingerprint.c_str());
   switch (alertType) {
     case READY:
                 messageBody = "Guardian Ready";
@@ -145,7 +149,7 @@ void sendAlert(int alertType) {
                 messageBody = "Garage has Closed";
                 break;
     default:
-//                Serial.println("Invalid alertType");
+              //  Serial.println("Invalid alertType");
                 break;
   }
   Serial.println(messageBody);
@@ -156,7 +160,7 @@ void sendAlert(int alertType) {
         to_number, from_number,
         messageBody,
         response,
-        media_url
+        media_url, fingerprint.c_str()
   );
 
   if (success) {
@@ -182,4 +186,41 @@ String prepareHtmlPage()
             "</html>" +
             "\r\n";
   return htmlPage;
+}
+
+boolean get_Fingerprint() {
+  String url = koala + fp_file;
+  WiFiClient client;
+
+  if (!client.connect(koala, 80)) {
+    Serial.println("Koala connection failed!\r\n");
+    return false;
+  }
+
+  // Make a HTTP request:
+  String header = "GET /" + fp_file + " HTTP/1.1";
+  Serial.print("header ");
+  Serial.println(header);
+  client.println(header);
+  String host = "Host: " + koala;
+  client.println(host);
+  client.println("Connection: close");
+  client.println();  
+
+  String response;
+  // Current kludge assumes the fingerprint is the last non-empty line of right length
+  while (client.connected()) {
+    String line = client.readStringUntil('\n');
+    if (line.length() >= 59) {
+      Serial.println("Add line to response");
+      response = line;
+    }
+  }
+
+  Serial.print("response: ");
+  Serial.println(response);
+  fingerprint = response;
+
+  client.stop();
+  return true;
 }

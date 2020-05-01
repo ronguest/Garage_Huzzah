@@ -24,7 +24,8 @@ public:
                 const String& from_number,
                 const String& message_body,
                 String& response,
-                const String& picture_url = ""
+                const String& picture_url = "",
+                String fp =""
         );
 
 private:
