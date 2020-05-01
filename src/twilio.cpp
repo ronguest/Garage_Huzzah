@@ -42,22 +42,6 @@ bool Twilio::send_message(
         const char* host = "api.twilio.com";
         const int   httpsPort = 443;
 
-        /*
-                THIS seems fragile. When trying to change the API key I suddenly
-                couldn't connect to api.twilio.com. After hours of futzing I discovered
-                the SHA1 fingerprint had changed??
-
-                NOTE the one in crednetials.h isn't used because of a type incompatibility
-                in the setFingerprint call. This was not previous here. I added it to finally
-                get the code working again. Having the fingerprint in the Twilio constructor call
-                in GarageMonitor.cpp wasn't doing any good. I don't understand why this change was
-                needed. I'm filing this in the "it works for now" category.
-
-                To get new fingerprint load api.twilio.com in Safari, click in the address bar's lock
-                icon, then view cert details and the fingerprints are at the very bottom
-
-                Fingerprint updated: Apr 29, 2020
-                */
         Serial.printf("Using fingerprint '%s'\n", fp.c_str());
         client.setFingerprint(fp.c_str());
 

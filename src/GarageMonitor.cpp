@@ -44,8 +44,6 @@ void setup() {
   currentState = doorState(inputPin);
   previousState = currentState;
 
-  get_Fingerprint();
-
   sendAlert(READY);
 }
 
@@ -100,10 +98,10 @@ void loop() {
     }
   }
 
-  if ((minute() == 0) && (second() == 0)) {
-    // Send a heartbeat message to AIO once an hour
+  /*if ((minute() == 0) && (second() == 0)) {
+    // Update the SHA1 fingerprint for Twilio once an hour
     get_Fingerprint();
-  }
+  }*/
   delay(pollTime);    // Throttle loop speed, should be at least 1 second
 }
 
@@ -136,21 +134,26 @@ int doorState (int pin) {
 }
 
 void sendAlert(int alertType) {
-  Serial.print("sendAlert fingerprint is: ");
-  Serial.println(fingerprint.c_str());
+  // Update Twilio's SHA1 fingerprint from koala
+  if (!get_Fingerprint()) {
+    Serial.println("Failed to read Twilio fingerprint");
+    return;
+  }
+  // Serial.print("sendAlert fingerprint is: ");
+  // Serial.println(fingerprint.c_str());
   switch (alertType) {
     case READY:
-                messageBody = "Guardian Ready";
-                break;
+      messageBody = "Guardian Ready";
+      break;
     case OPEN:
-                messageBody = "Garage is Open!";
-                break;
+      messageBody = "Garage is Open!";
+      break;
     case G_CLOSED:
-                messageBody = "Garage has Closed";
-                break;
+      messageBody = "Garage has Closed";
+      break;
     default:
-              //  Serial.println("Invalid alertType");
-                break;
+      //  Serial.println("Invalid alertType");
+      break;
   }
   Serial.println(messageBody);
 
@@ -189,7 +192,6 @@ String prepareHtmlPage()
 }
 
 boolean get_Fingerprint() {
-  String url = koala + fp_file;
   WiFiClient client;
 
   if (!client.connect(koala, 80)) {
@@ -199,8 +201,8 @@ boolean get_Fingerprint() {
 
   // Make a HTTP request:
   String header = "GET /" + fp_file + " HTTP/1.1";
-  Serial.print("header ");
-  Serial.println(header);
+  // Serial.print("header ");
+  // Serial.println(header);
   client.println(header);
   String host = "Host: " + koala;
   client.println(host);
@@ -212,13 +214,13 @@ boolean get_Fingerprint() {
   while (client.connected()) {
     String line = client.readStringUntil('\n');
     if (line.length() >= 59) {
-      Serial.println("Add line to response");
+      // Serial.println("Add line to response");
       response = line;
     }
   }
 
-  Serial.print("response: ");
-  Serial.println(response);
+  // Serial.print("response: ");
+  // Serial.println(response);
   fingerprint = response;
 
   client.stop();
